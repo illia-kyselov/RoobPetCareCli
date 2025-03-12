@@ -1,0 +1,105 @@
+import React, { useState, useMemo } from 'react';
+import {
+    SafeAreaView,
+    StyleSheet,
+    Image,
+    ScrollView,
+    KeyboardAvoidingView,
+    Platform,
+} from 'react-native';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import { useDispatch, useSelector } from 'react-redux';
+
+import AddPhotoHeader from '../../components/Pets/AddPhotoHeader';
+import CustomInput from '../../components/CustomInput';
+import { selectPetById, updatePetBehavior } from '../../store/slices/petsSlice';
+
+export default function BehaviorScreen() {
+    const navigation = useNavigation();
+    const route = useRoute();
+    const dispatch = useDispatch();
+
+    const { petId } = route.params;
+    const pet = useSelector((state) => selectPetById(state, petId));
+
+    const isNewEntry = route.params?.editSingleField;
+    const lastBehavior = pet?.behavior?.[pet.behavior.length - 1];
+    const [date, setDate] = useState(isNewEntry ? '' : lastBehavior?.date || '');
+    const [behavior, setBehavior] = useState(isNewEntry ? '' : lastBehavior?.note || '');
+
+    const allFieldsFilled = useMemo(() => {
+        return date.trim() && behavior.trim();
+    }, [date, behavior]);
+
+    const handleBackPress = () => {
+        navigation.goBack();
+    };
+
+    const handleDonePress = () => {
+        dispatch(
+            updatePetBehavior({
+                petId,
+                newBehavior: {
+                    date,
+                    note: behavior,
+                },
+                editSingleField: isNewEntry,
+            })
+        );
+        if (route.params?.editSingleField) {
+            navigation.goBack();
+        } else {
+            navigation.replace('PetDetail', { petId });
+        }
+    };
+
+    return (
+        <SafeAreaView style={styles.container}>
+            <AddPhotoHeader
+                title="Behavior"
+                onBackPress={handleBackPress}
+                onDonePress={handleDonePress}
+                doneButtonActive={allFieldsFilled}
+            />
+            <KeyboardAvoidingView
+                style={{ flex: 1 }}
+                behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+            >
+                <ScrollView contentContainerStyle={styles.contentContainer}>
+                    <Image
+                        source={require('../../assets/paw/animals3.png')}
+                        style={styles.topImage}
+                        resizeMode="contain"
+                    />
+                    <CustomInput
+                        placeholder="Date (e.g. 20.05.2025)"
+                        value={date}
+                        onChangeText={setDate}
+                    />
+                    <CustomInput
+                        placeholder="Behavior"
+                        value={behavior}
+                        onChangeText={setBehavior}
+                        multiline
+                    />
+                </ScrollView>
+            </KeyboardAvoidingView>
+        </SafeAreaView>
+    );
+}
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: '#26284D',
+    },
+    contentContainer: {
+        paddingHorizontal: 20,
+        paddingTop: 28,
+    },
+    topImage: {
+        width: '100%',
+        height: 150,
+        marginBottom: 16,
+    },
+});
