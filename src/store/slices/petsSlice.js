@@ -26,22 +26,20 @@ const petsSlice = createSlice({
             const { petId, newGrowthHistory } = action.payload;
             const pet = state.pets.find((p) => p.id === petId);
             if (pet) {
-                if (pet.growthHistory && pet.growthHistory.length > 0) {
-                    pet.growthHistory[pet.growthHistory.length - 1] = newGrowthHistory;
-                } else {
-                    pet.growthHistory.push(newGrowthHistory);
+                if (!pet.growthHistory) {
+                    pet.growthHistory = [];
                 }
+                pet.growthHistory.push(newGrowthHistory);
             }
         },
         updatePetBehavior: (state, action) => {
             const { petId, newBehavior } = action.payload;
             const pet = state.pets.find((p) => p.id === petId);
             if (pet) {
-                if (pet.behavior && pet.behavior.length > 0) {
-                    pet.behavior[pet.behavior.length - 1] = newBehavior;
-                } else {
-                    pet.behavior.push(newBehavior);
+                if (!pet.behavior) {
+                    pet.behavior = [];
                 }
+                pet.behavior.push(newBehavior);
             }
         },
     },

@@ -7,7 +7,7 @@ import QuizButton from '../../components/Quiz/QuizButton';
 export default function QuizScreen() {
     const navigation = useNavigation();
     const handleBackPress = () => navigation.goBack();
-    const handleSettingsPress = () => navigation.navigate('Settings');
+    const handleSettingsPress = () => navigation.navigate('SettingsStack', { screen: 'Settings' });
     const handleStartQuiz = () => navigation.navigate('QuizQuestions');
 
     return (
